@@ -26,6 +26,12 @@ class Login extends React.Component {
     history.push('/jogo');
   }
 
+  handleSubmitSet() {
+    const { submitLoginAction, history } = this.props;
+    submitLoginAction(this.state);
+    history.push('/settings');
+  }
+
   render() {
     const { email, name } = this.state;
 
@@ -71,6 +77,14 @@ class Login extends React.Component {
           onClick={ this.handleSubmit }
         >
           Play
+        </button>
+        <button
+          type="submit"
+          data-testid="btn-settings"
+          disabled={ !validateEmail(email) || !validateName(name) }
+          onClick={ this.handleSubmitSet }
+        >
+          Settings
         </button>
       </main>
     );
