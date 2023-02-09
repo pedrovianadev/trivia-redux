@@ -14,6 +14,7 @@ class Login extends React.Component {
 
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
+    this.handleSubmitSet = this.handleSubmitSet.bind(this);
   }
 
   handleChange({ target }) {
@@ -81,7 +82,6 @@ class Login extends React.Component {
         <button
           type="submit"
           data-testid="btn-settings"
-          disabled={ !validateEmail(email) || !validateName(name) }
           onClick={ this.handleSubmitSet }
         >
           Settings
