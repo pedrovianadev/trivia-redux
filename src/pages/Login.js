@@ -21,11 +21,17 @@ class Login extends React.Component {
     this.setState({ [target.name]: target.value });
   }
 
-  handleSubmit() {
+  handleSubmit = async () => {
     const { submitLoginAction, history } = this.props;
+    const triviaURL = 'https://opentdb.com/api_token.php?command=request';
+    await fetch(triviaURL)
+      .then((response) => response.json())
+      .then((data) => {
+        localStorage.setItem('token', data.token);
+      });
     submitLoginAction(this.state);
     history.push('/jogo');
-  }
+  };
 
   handleSubmitSet() {
     const { submitLoginAction, history } = this.props;
