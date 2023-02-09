@@ -23,7 +23,7 @@ class Login extends React.Component {
   handleSubmit() {
     const { submitLoginAction, history } = this.props;
     submitLoginAction(this.state);
-    history.push('/jogo');
+    history.push('/game');
   }
 
   handleSubmitSet() {
