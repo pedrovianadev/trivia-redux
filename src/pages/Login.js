@@ -30,7 +30,7 @@ class Login extends React.Component {
         localStorage.setItem('token', data.token);
       });
     submitLoginAction(this.state);
-    history.push('/jogo');
+    history.push('/game');
   };
 
   handleSubmitSet() {
