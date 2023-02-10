@@ -14,17 +14,24 @@ class Login extends React.Component {
 
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
+    this.handleSubmitSet = this.handleSubmitSet.bind(this);
   }
 
   handleChange({ target }) {
     this.setState({ [target.name]: target.value });
   }
 
-  handleSubmit() {
+  handleSubmit = async () => {
     const { submitLoginAction, history } = this.props;
+    const triviaURL = 'https://opentdb.com/api_token.php?command=request';
+    await fetch(triviaURL)
+      .then((response) => response.json())
+      .then((data) => {
+        localStorage.setItem('token', data.token);
+      });
     submitLoginAction(this.state);
-    history.push('/game');
-  }
+    history.push('/jogo');
+  };
 
   handleSubmitSet() {
     const { submitLoginAction, history } = this.props;
@@ -81,7 +88,6 @@ class Login extends React.Component {
         <button
           type="submit"
           data-testid="btn-settings"
-          disabled={ !validateEmail(email) || !validateName(name) }
           onClick={ this.handleSubmitSet }
         >
           Settings
