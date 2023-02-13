@@ -4,14 +4,6 @@ import userEvent from '@testing-library/user-event';
 import renderWithRouterAndRedux from './helpers/renderWithRouterAndRedux';
 import App from '../App';
 
-const INITAL_STORE = {
-  player: {
-      name: "Player",
-      email: "player@trybe.com",
-      token: "0b03b51ebc8a17ff01e33b0f60bea081d328ec13ae8caaba9fb2b6e660b09ddd",
-  },
-}
-
 const mockFetch = () => {
   jest.spyOn(global, 'fetch')
     .mockImplementation(() => Promise.resolve({
@@ -44,27 +36,58 @@ describe ('Login', () => {
         expect(emailEL.value).toBe(USER_EMAIL)
     })
 
-    it('se o botão Play aparece na página', async () => {
-       const { history } = renderWithRouterAndRedux(<App />, INITAL_STORE);
-       const USER_EMAIL = 'user@example.com';
-       const USER_NAME = 'User Test';
-        
-        const emailEL = screen.getByLabelText(/^Email:$/i);
-        expect(emailEL).toBeInTheDocument();
-        userEvent.type(emailEL, USER_EMAIL)
+    it('Testa se a tela de login possui o botão de Play e está desativado:', () => {
+        renderWithRouterAndRedux(<App />);
+        const playBtn = screen.getByRole('button', {
+            name: /play/i
+          });
 
-
-        const nomeEL = screen.getByLabelText(/^Nome:$/i);
-        expect(nomeEL).toBeInTheDocument();
-        userEvent.type(nomeEL, USER_NAME)
-        
-        const btnPlayEL = screen.getByRole('button', { name: /Play/i});
-        expect(btnPlayEL).toBeInTheDocument();
-        userEvent.click(btnPlayEL);
-        await waitFor(() => {
-        expect(history.location.pathname).toBe('/game');
-        });
+        expect(playBtn).toBeInTheDocument();
+        expect(playBtn).toBeDisabled();
     });
+
+    it('Testa se o botão play é ativado ao preencher os inputs', () => {
+        renderWithRouterAndRedux(<App />);
+        const name = screen.getByTestId('input-player-name');
+        const email = screen.getByTestId('input-gravatar-email'); 
+        const playBtn = screen.getByRole('button', {
+          name: /play/i
+        });
+  
+        userEvent.type(email, 'test@test.com');
+        expect(playBtn).toBeDisabled();
+  
+        userEvent.type(name, 'Test');
+        userEvent.clear(email);
+        expect(playBtn).toBeDisabled();
+  
+        userEvent.type(email, 'test@test.com')
+        expect(playBtn).toBeEnabled();
+      })
+
+    test('Testa se o botão play redireciona para a página "/game" e chama a função fetch', () => {
+        const mockToken = {
+            token: 'ab98a9va8e9a8f9ae'
+        }
+        jest.spyOn(global, 'fetch')
+        global.fetch.mockResolvedValue({
+              json: jest.fn().mockResolvedValue(mockToken)
+        })
+        const { history } = renderWithRouterAndRedux(<App />);
+        const name = screen.getByTestId('input-player-name');
+        const email = screen.getByTestId('input-gravatar-email'); 
+        const playBtn = screen.getByRole('button', {
+          name: /play/i
+        });
+  
+        userEvent.type(name, 'Test');
+        userEvent.type(email, 'test@test.com');
+        userEvent.click(playBtn);
+        expect(global.fetch).toHaveBeenCalled();
+        waitFor(() => {
+          expect(history.location.pathname).toBe('/game');
+        });
+      })
 
     it('Se é redirecionado para "Settings"', () => {
         const { history } = renderWithRouterAndRedux(<App />);
