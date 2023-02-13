@@ -26,6 +26,12 @@ class Game extends React.Component {
     this.updateCounter();
   }
 
+  handleAnswers(question) {
+    const { answers } = this.state;
+    const array = Object.entries(question);
+    console.log(question);
+  }
+
   updateCounter() {
     const { counter } = this.state;
     const { questions } = this.props;
@@ -44,12 +50,6 @@ class Game extends React.Component {
     this.setState({
       filteredQuestion: filter[0],
     });
-  }
-
-  handleAnswers(question) {
-    const { answers } = this.state;
-    const array = Object.entries(question);
-    console.log(question);
   }
 
   render() {
