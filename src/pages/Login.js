@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
-import { loginOk } from '../redux/action';
+import { loginOk, thunkToken } from '../redux/action';
 
 class Login extends React.Component {
   constructor() {
@@ -20,9 +20,10 @@ class Login extends React.Component {
     this.setState({ [target.name]: target.value });
   }
 
-  handleSubmit() {
-    const { submitLoginAction, history } = this.props;
+  async handleSubmit() {
+    const { submitLoginAction, history, dispatchToken } = this.props;
     submitLoginAction(this.state);
+    await dispatchToken();
     history.push('/game');
   }
 
@@ -74,7 +75,7 @@ class Login extends React.Component {
           type="submit"
           data-testid="btn-play"
           disabled={ !validateEmail(email) || !validateName(name) }
-          onClick={ this.handleSubmit }
+          onClick={ () => this.handleSubmit() }
         >
           Play
         </button>
@@ -82,7 +83,7 @@ class Login extends React.Component {
           type="submit"
           data-testid="btn-settings"
           disabled={ !validateEmail(email) || !validateName(name) }
-          onClick={ this.handleSubmitSet }
+          onClick={ () => this.handleSubmitSet() }
         >
           Settings
         </button>
@@ -93,6 +94,7 @@ class Login extends React.Component {
 
 const mapDispatchToProps = (dispatch) => ({
   submitLoginAction: (user) => dispatch(loginOk(user)),
+  dispatchToken: () => dispatch(thunkToken()),
 });
 
 Login.propTypes = {

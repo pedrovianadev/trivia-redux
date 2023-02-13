@@ -1,10 +1,11 @@
-import { LOGIN, SEARCH_SUCCESS, API_ERROR, QUESTIONS } from '../action';
+import { LOGIN, SEARCH_SUCCESS, API_ERROR, QUESTIONS, TOKEN_INVALID } from '../action';
 
 const INITIAL_STATE = {
   name: '',
   email: '',
   token: '',
   questions: [],
+  redirect: false,
 };
 
 function user(state = INITIAL_STATE, action) {
@@ -19,6 +20,11 @@ function user(state = INITIAL_STATE, action) {
     return {
       ...state,
       error: action.error,
+    };
+  case TOKEN_INVALID:
+    return {
+      ...state,
+      redirect: true,
     };
   case SEARCH_SUCCESS:
     return {

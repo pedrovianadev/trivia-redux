@@ -1,61 +1,71 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
+import { Redirect } from 'react-router-dom';
 import Header from '../components/Header';
-import { thunkToken, thunkQuestions } from '../redux/action';
+import Question from '../components/Question';
+import Answers from '../components/Answers';
+import { thunkQuestions } from '../redux/action';
 
 class Game extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      answered: false,
+      questionIndex: 0,
+      question: null,
+      answers: null,
     };
-    this.handleClick = this.handleClick.bind(this);
+    this.nextQuestion = this.nextQuestion.bind(this);
+    this.getAnswers = this.getAnswers.bind(this);
   }
 
-  componentDidMount() {
-    const { dispatch, token } = this.props;
-    dispatch(thunkQuestions(token));
-  }
-
-  handleClick() {
+  async componentDidMount() {
     const { dispatch } = this.props;
-    thunkToken();
-    dispatch(thunkToken());
+    const token = localStorage.getItem('token');
+    console.log(token);
+    await dispatch(thunkQuestions(token));
+    const { questions } = this.props;
+    console.log(questions);
+    const { questionIndex } = this.state;
+
+    this.setState({
+      question: questions[questionIndex],
+    }, () => this.getAnswers());
+  }
+
+  getAnswers() {
+    const { question } = this.state;
+    return question && this.setState({
+      answers: [...question.incorrect_answers, question.correct_answer].sort(),
+    });
+  }
+
+  nextQuestion() {
+    const { questionIndex } = this.state;
+    const { questions } = this.props;
+    if (questionIndex <= questions.length - 2) {
+      this.setState((prevState) => ({
+        questionIndex: prevState.questionIndex + 1,
+        question: questions[prevState.questionIndex + 1],
+      }), () => this.getAnswers());
+    }
   }
 
   render() {
-    const { answered } = this.state;
-    return (
-      <div>
-        <Header />
-        <p data-testid="question-category"> </p>
-        <p data-testid="question-text">
-          {/* { question } */}
-        </p>
-        <div data-testid="answer-options">
-          {/* { answer.map((answer, index) => (
-            <button
-              type="button"
-              key={ index }
-              data-testid={ answer.correct ? 'correct-answer' : `wrong-answer-${index}` }
-              onClick={ this.handleClick }
-              style={
-                answered ? { border: answer.correct ? '3px solid rgb(6,240,15)' : '3px solid red'}
-                : { border: '3px solid black' }
-              }
-            >
-              { answer.correct ? { answer.correct_answer } : {incorrect_answers.find((incorrect, index) => index === answer.index)}}
-            </button>
-          ))} */}
-        </div>
-        <button
-          type="button"
-          onClick={ this.handleClick }
-        >
-          Buscar
+    const { question, answers } = this.state;
+    const { questions, redirect } = this.props;
 
-        </button>
+    return (redirect ? <Redirect to="/" />
+      : <div>
+        <Header />
+        {
+          question
+          && <div>
+            <Question question={ question } />
+            <Answers answers={ answers } />
+          </div>
+        }
+        <button onClick={ () => this.nextQuestion() }>Próxima Pergunta </button>
       </div>
 
     );
@@ -64,11 +74,15 @@ class Game extends React.Component {
 
 const mapStateToProps = (state) => ({
   token: state.user.token,
+  time: state.time.time,
+  questions: state.user.questions,
+  redirect: state.user.redirect,
 });
 
 Game.propTypes = {
   dispatch: PropTypes.func.isRequired,
   token: PropTypes.string.isRequired,
+  questions: PropTypes.shape([]).isRequired,
 };
 
 export default connect(mapStateToProps)(Game);
