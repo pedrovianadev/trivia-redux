@@ -3,7 +3,6 @@ import { LOGIN, SEARCH_SUCCESS, API_ERROR, QUESTIONS, TOKEN_INVALID } from '../a
 const INITIAL_STATE = {
   name: '',
   email: '',
-  token: '',
   questions: [],
   redirect: false,
 };

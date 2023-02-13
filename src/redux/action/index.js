@@ -67,8 +67,8 @@ export function thunkQuestions(newToken) {
       if (!token) {
         throw Error();
       }
-
       dispatch(questions(data.results));
+      console.log(data.results);
     } catch (error) {
       dispatch(tokenInvalid());
     }

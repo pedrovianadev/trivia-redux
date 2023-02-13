@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
 
 class Answers extends React.Component {
   render() {
@@ -9,7 +8,13 @@ class Answers extends React.Component {
       <div data-testid="answer-options">
         {
           answers && answers
-            .map((answer, index) => <button key={ index }>{answer}</button>)
+            .map((answer) => (
+              <button
+                data-testid={ answer.dataTest }
+                key={ answer.answers }
+              >
+                {answer.answers}
+              </button>))
         }
       </div>
     );
@@ -20,7 +25,4 @@ Answers.propTypes = {
   answers: PropTypes.shape([]).isRequired,
 };
 
-const mapStateToProps = (state) => ({
-});
-
-export default connect(mapStateToProps)(Answers);
+export default Answers;
