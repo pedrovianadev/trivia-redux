@@ -2,7 +2,6 @@ import React from "react";
 import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import renderWithRouterAndRedux from './helpers/renderWithRouterAndRedux';
-// import Login from '../pages/Login';
 import App from '../App';
 
 const INITAL_STORE = {
@@ -63,7 +62,7 @@ describe ('Login', () => {
         expect(btnPlayEL).toBeInTheDocument();
         userEvent.click(btnPlayEL);
         await waitFor(() => {
-        expect(history.location.pathname).toBe('/jogo');
+        expect(history.location.pathname).toBe('/game');
         });
     });
 
