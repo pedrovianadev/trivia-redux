@@ -18,6 +18,14 @@ function Feedback() {
       <p data-testid="header-score">
         {user.score}
       </p>
+      <h1 data-testid="feedback-total-score">
+        {user.score}
+      </h1>
+
+      {/* Abaixo eu preciso que seja feito a contabilidade de quantas o usuário acertou para que funcione, por isso está comentada */}
+      {/* <h2 data-testid="feedback-total-question">
+        {user.corrects}
+      </h2> */}
       <button
         type="button"
         data-testid="btn-play-again"
