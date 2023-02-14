@@ -13,12 +13,13 @@ class Game extends React.Component {
     super(props);
     this.state = {
       questionIndex: 0,
-    /*   question: null,
-      answers: null, */
+      answered: false,
+      isDisabled: false,
     };
     this.nextQuestion = this.nextQuestion.bind(this);
     /*     this.getAnswers = this.getAnswers.bind(this); */
     this.handAnswers = this.handAnswers.bind(this);
+    this.testResponse = this.testResponse.bind(this);
   }
 
   async componentDidMount() {
@@ -41,6 +42,15 @@ class Game extends React.Component {
     });
   } */
 
+  testResponse() {
+    const { dispatch } = this.props;
+    this.setState({
+      answered: true,
+      isDisabled: true,
+    });
+    dispatch(runTime());
+  }
+
   nextQuestion() {
     const { questionIndex } = this.state;
     const { questions, dispatch } = this.props;
@@ -48,6 +58,7 @@ class Game extends React.Component {
     if (questionIndex <= questions.length - 2) {
       this.setState((prevState) => ({
         questionIndex: prevState.questionIndex + 1,
+        answered: false,
       /*   question: questions[prevState.questionIndex + 1], */
       })/* , () => this.getAnswers() */);
     }
@@ -72,7 +83,7 @@ class Game extends React.Component {
   }
 
   render() {
-    const { questionIndex } = this.state;
+    const { questionIndex, answered, isDisabled } = this.state;
     const { questions, redirect } = this.props;
 
     return (redirect ? <Redirect to="/" />
@@ -85,11 +96,23 @@ class Game extends React.Component {
               <div>
                 <Question question={ questions[questionIndex] } />
                 <Answers
+                  answered={ answered }
                   answers={ this.handAnswers() }
+                  isDisabled={ isDisabled }
+                  testResponse={ this.testResponse }
                 />
               </div>)
           }
-          <button onClick={ () => this.nextQuestion() }>Próxima Pergunta </button>
+          {
+            answered && (
+              <button
+                data-testid="btn-next"
+                onClick={ () => this.nextQuestion() }
+              >
+                Next
+              </button>
+            )
+          }
           <Timer />
         </div>)
     );
@@ -105,42 +128,8 @@ const mapStateToProps = (state) => ({
 
 Game.propTypes = {
   dispatch: PropTypes.func.isRequired,
-  questions: PropTypes.shape([]).isRequired,
+  questions: PropTypes.objectOf.isRequired,
   redirect: PropTypes.bool.isRequired,
 };
 
 export default connect(mapStateToProps)(Game);
-
-/*   { questions.map((answer, index) => (
-    <button
-      type="button"
-      key={ index }
-      data-testid={
-        answer.correct ? 'correct-answer' : `wrong-answer-${index}`
-      }
-      onClick={ this.handleClick }
-      style={
-        answered ? { border: answer.correct ? '3px solid rgb(6,240,15)' : '3px solid red'}
-        : { border: '3px solid black' }
-      }
-    >
-      Resposta
-      { answer.correctquestions ? { answer.correct_answer } : {incorrect_answers.find((incorrect, index) => index === answer.index)}}
-    </button>
-  ))} */
-
-//   <button
-//   type="button"
-//   data-testid={
-//     e.correct ? 'correct-answer' : `wrong-answer-${index}`
-//   }
-//   id={
-//     e.correct ? 'correct-answer' : `wrong-answer-${index}`
-//   }
-// >
-//   Resposta
-//   { index }
-// </button>
-
-// (Object.keys(filteredQuestion)
-//             .find((key) => console.log(key === 'incorrect_answers')))
