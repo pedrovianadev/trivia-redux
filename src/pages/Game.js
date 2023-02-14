@@ -23,7 +23,6 @@ class Game extends React.Component {
   async componentDidMount() {
     const { dispatch } = this.props;
     const token = localStorage.getItem('token');
-    console.log(token);
     await dispatch(thunkQuestions(token));
     const { questions } = this.props;
     console.log(questions);
@@ -48,7 +47,7 @@ class Game extends React.Component {
       this.setState((prevState) => ({
         questionIndex: prevState.questionIndex + 1,
       /*   question: questions[prevState.questionIndex + 1], */
-      }), () => this.getAnswers());
+      })/* , () => this.getAnswers() */);
     }
   }
 
@@ -58,10 +57,12 @@ class Game extends React.Component {
     const correct = {
       answers: questions[questionIndex].correct_answer,
       dataTest: 'correct-answer',
+      style: 'correct-answer',
     };
     const incorrect = questions[questionIndex].incorrect_answers.map((alt, index) => ({
       answers: alt,
       dataTest: `wrong-answer-${index}`,
+      style: 'wrong-answer',
     }));
     const magicnumber = 0.5;
     const mergeAlt = [correct, ...incorrect].sort(() => Math.random() - magicnumber);
