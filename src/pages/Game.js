@@ -5,7 +5,8 @@ import { Redirect } from 'react-router-dom';
 import Header from '../components/Header';
 import Question from '../components/Question';
 import Answers from '../components/Answers';
-import { thunkQuestions } from '../redux/action';
+import Timer from '../components/Timer';
+import { thunkQuestions, runTime } from '../redux/action';
 
 class Game extends React.Component {
   constructor(props) {
@@ -42,7 +43,8 @@ class Game extends React.Component {
 
   nextQuestion() {
     const { questionIndex } = this.state;
-    const { questions } = this.props;
+    const { questions, dispatch } = this.props;
+    dispatch(runTime());
     if (questionIndex <= questions.length - 2) {
       this.setState((prevState) => ({
         questionIndex: prevState.questionIndex + 1,
@@ -88,6 +90,7 @@ class Game extends React.Component {
               </div>)
           }
           <button onClick={ () => this.nextQuestion() }>Próxima Pergunta </button>
+          <Timer />
         </div>)
     );
   }
