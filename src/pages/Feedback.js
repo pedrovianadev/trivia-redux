@@ -4,12 +4,13 @@ import { useHistory } from 'react-router-dom';
 
 function Feedback() {
   const history = useHistory();
+  const avatar = md5(email).toString();
 
   return (
     <div data-testid="feedback-text">
       <img
         alt="imagem de perfil"
-        src={ `https://www.gravatar.com/avatar/${md5(email)}` }
+        src={ `https://www.gravatar.com/avatar/${avatar}` }
         data-testid="header-profile-picture"
       />
       <p data-testid="header-player-name">
