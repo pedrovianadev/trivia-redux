@@ -41,6 +41,11 @@ export const runTime = (value) => ({
   value,
 });
 
+export const RESET_BUTTON = 'TOKEN_VALID';
+export const resetButton = () => ({
+  type: RESET_BUTTON,
+});
+
 export function thunkToken() {
   return async (dispatch) => {
     try {

@@ -6,18 +6,18 @@ import Header from '../components/Header';
 import Question from '../components/Question';
 import Answers from '../components/Answers';
 import Timer from '../components/Timer';
-import { thunkQuestions, runTime } from '../redux/action';
+import { thunkQuestions } from '../redux/action';
 
 class Game extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       questionIndex: 0,
+      timer: 30,
       answered: false,
       isDisabled: false,
     };
     this.nextQuestion = this.nextQuestion.bind(this);
-    /*     this.getAnswers = this.getAnswers.bind(this); */
     this.handAnswers = this.handAnswers.bind(this);
     this.testResponse = this.testResponse.bind(this);
   }
@@ -26,13 +26,7 @@ class Game extends React.Component {
     const { dispatch } = this.props;
     const token = localStorage.getItem('token');
     await dispatch(thunkQuestions(token));
-    const { questions } = this.props;
-    console.log(questions);
-    // const { questionIndex } = this.state;
-
-  /*   this.setState({
-      question: questions[questionIndex],
-    }, () => this.getAnswers() ); */
+    this.handleTimer();
   }
 
   /*  getAnswers() {
@@ -42,26 +36,22 @@ class Game extends React.Component {
     });
   } */
 
-  testResponse() {
-    const { dispatch } = this.props;
-    this.setState({
-      answered: true,
-      isDisabled: true,
-    });
-    dispatch(runTime());
-  }
-
-  nextQuestion() {
-    const { questionIndex } = this.state;
-    const { questions, dispatch } = this.props;
-    dispatch(runTime());
-    if (questionIndex <= questions.length - 2) {
-      this.setState((prevState) => ({
-        questionIndex: prevState.questionIndex + 1,
-        answered: false,
-      /*   question: questions[prevState.questionIndex + 1], */
-      })/* , () => this.getAnswers() */);
-    }
+  handleTimer() {
+    const magicNumber = 1000;
+    const interval = setInterval(() => {
+      const { timer } = this.state;
+      console.log(timer);
+      if (timer === 0) {
+        this.setState({
+          isDisabled: true,
+        });
+        clearInterval(interval);
+        return;
+      }
+      this.setState({
+        timer: timer - 1,
+      });
+    }, magicNumber);
   }
 
   handAnswers() {
@@ -82,10 +72,31 @@ class Game extends React.Component {
     return mergeAlt;
   }
 
-  render() {
-    const { questionIndex, answered, isDisabled } = this.state;
-    const { questions, redirect } = this.props;
+  nextQuestion() {
+    console.log('oi');
+    const { questionIndex } = this.state;
+    const { questions } = this.props;
+    if (questionIndex <= questions.length - 2) {
+      this.setState((prevState) => ({
+        questionIndex: prevState.questionIndex + 1,
+        answered: false,
+        isDisabled: false,
+        timer: 30,
+      /*   question: questions[prevState.questionIndex + 1], */
+      })/* , () => this.getAnswers() */);
+    }
+  }
 
+  testResponse() {
+    this.setState({
+      answered: true,
+      isDisabled: true,
+    });
+  }
+
+  render() {
+    const { questionIndex, answered, isDisabled, timer } = this.state;
+    const { questions, redirect } = this.props;
     return (redirect ? <Redirect to="/" />
       : (
         <div>
@@ -97,7 +108,7 @@ class Game extends React.Component {
                 <Question question={ questions[questionIndex] } />
                 <Answers
                   answered={ answered }
-                  answers={ this.handAnswers() }
+                  answers={ this.handAnswers }
                   isDisabled={ isDisabled }
                   testResponse={ this.testResponse }
                 />
@@ -113,23 +124,21 @@ class Game extends React.Component {
               </button>
             )
           }
-          <Timer />
+          <Timer
+            handleTimer={ timer }
+          />
         </div>)
     );
   }
 }
-
 const mapStateToProps = (state) => ({
   token: state.user.token,
-  time: state.time.time,
   questions: state.user.questions,
   redirect: state.user.redirect,
 });
-
 Game.propTypes = {
   dispatch: PropTypes.func.isRequired,
   questions: PropTypes.objectOf.isRequired,
   redirect: PropTypes.bool.isRequired,
 };
-
 export default connect(mapStateToProps)(Game);
