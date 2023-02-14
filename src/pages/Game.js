@@ -127,37 +127,3 @@ Game.propTypes = {
 };
 
 export default connect(mapStateToProps)(Game);
-
-/*   { questions.map((answer, index) => (
-    <button
-      type="button"
-      key={ index }
-      data-testid={
-        answer.correct ? 'correct-answer' : `wrong-answer-${index}`
-      }
-      onClick={ this.handleClick }
-      style={
-        answered ? { border: answer.correct ? '3px solid rgb(6,240,15)' : '3px solid red'}
-        : { border: '3px solid black' }
-      }
-    >
-      Resposta
-      { answer.correctquestions ? { answer.correct_answer } : {incorrect_answers.find((incorrect, index) => index === answer.index)}}
-    </button>
-  ))} */
-
-//   <button
-//   type="button"
-//   data-testid={
-//     e.correct ? 'correct-answer' : `wrong-answer-${index}`
-//   }
-//   id={
-//     e.correct ? 'correct-answer' : `wrong-answer-${index}`
-//   }
-// >
-//   Resposta
-//   { index }
-// </button>
-
-// (Object.keys(filteredQuestion)
-//             .find((key) => console.log(key === 'incorrect_answers')))
