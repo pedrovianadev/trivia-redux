@@ -3,19 +3,8 @@ import PropTypes from 'prop-types';
 import '../style/answers.css';
 
 class Answers extends React.Component {
-  state = {
-    answered: false,
-  };
-
-  testResponse = () => {
-    this.setState({
-      answered: true,
-    });
-  };
-
   render() {
-    const { answers } = this.props;
-    const { answered } = this.state;
+    const { answers, answered, testResponse } = this.props;
     return (
       <div data-testid="answer-options">
         {
@@ -25,7 +14,7 @@ class Answers extends React.Component {
                 data-testid={ answer.dataTest }
                 key={ answer.answers }
                 className={ answered ? answer.style : '' }
-                onClick={ () => this.testResponse() }
+                onClick={ () => testResponse() }
               >
                 {answer.answers}
               </button>))
@@ -36,7 +25,9 @@ class Answers extends React.Component {
 }
 
 Answers.propTypes = {
-  answers: PropTypes.shape([]).isRequired,
+  answers: PropTypes.objectOf.isRequired,
+  answered: PropTypes.bool.isRequired,
+  testResponse: PropTypes.func.isRequired,
 };
 
 export default Answers;

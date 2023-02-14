@@ -12,12 +12,14 @@ class Game extends React.Component {
     super(props);
     this.state = {
       questionIndex: 0,
+      answered: false,
     /*   question: null,
       answers: null, */
     };
     this.nextQuestion = this.nextQuestion.bind(this);
     /*     this.getAnswers = this.getAnswers.bind(this); */
     this.handAnswers = this.handAnswers.bind(this);
+    this.testResponse = this.testResponse.bind(this);
   }
 
   async componentDidMount() {
@@ -40,12 +42,19 @@ class Game extends React.Component {
     });
   } */
 
+  testResponse() {
+    this.setState({
+      answered: true,
+    });
+  }
+
   nextQuestion() {
     const { questionIndex } = this.state;
     const { questions } = this.props;
     if (questionIndex <= questions.length - 2) {
       this.setState((prevState) => ({
         questionIndex: prevState.questionIndex + 1,
+        answered: false,
       /*   question: questions[prevState.questionIndex + 1], */
       })/* , () => this.getAnswers() */);
     }
@@ -70,7 +79,7 @@ class Game extends React.Component {
   }
 
   render() {
-    const { questionIndex } = this.state;
+    const { questionIndex, answered } = this.state;
     const { questions, redirect } = this.props;
 
     return (redirect ? <Redirect to="/" />
@@ -83,11 +92,22 @@ class Game extends React.Component {
               <div>
                 <Question question={ questions[questionIndex] } />
                 <Answers
+                  answered={ answered }
                   answers={ this.handAnswers() }
+                  testResponse={ this.testResponse }
                 />
               </div>)
           }
-          <button onClick={ () => this.nextQuestion() }>Próxima Pergunta </button>
+          {
+            answered && (
+              <button
+                data-testid="btn-next"
+                onClick={ () => this.nextQuestion() }
+              >
+                Next
+              </button>
+            )
+          }
         </div>)
     );
   }
@@ -102,7 +122,7 @@ const mapStateToProps = (state) => ({
 
 Game.propTypes = {
   dispatch: PropTypes.func.isRequired,
-  questions: PropTypes.shape([]).isRequired,
+  questions: PropTypes.objectOf.isRequired,
   redirect: PropTypes.bool.isRequired,
 };
 
