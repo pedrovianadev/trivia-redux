@@ -6,10 +6,11 @@ import '../style/answers.css';
 class Answers extends React.Component {
   render() {
     const { answers, answered, testResponse, isDisabled } = this.props;
+    const result = answers();
     return (
       <div data-testid="answer-options">
         {
-          answers && answers
+          result && result
             .map((answer) => (
               <button
                 data-testid={ answer.dataTest }
@@ -27,7 +28,7 @@ class Answers extends React.Component {
 }
 
 Answers.propTypes = {
-  answers: PropTypes.objectOf.isRequired,
+  answers: PropTypes.shape([]).isRequired,
   answered: PropTypes.bool.isRequired,
   testResponse: PropTypes.func.isRequired,
   isDisabled: PropTypes.bool.isRequired,
