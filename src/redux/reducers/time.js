@@ -1,8 +1,8 @@
-import { TIME, RUN_TIME } from '../action';
+import { TIME, RUN_TIME, RESET_BUTTON } from '../action';
 
 const INITIAL_STATE = {
-  time: 30,
-  runTime: true,
+  timer: 30,
+  isDlisable: false,
 };
 
 const time = (state = INITIAL_STATE, action) => {
@@ -10,17 +10,18 @@ const time = (state = INITIAL_STATE, action) => {
   case TIME:
     return {
       ...state,
-      time: state.time - 1,
+      timer: state.timer - 1,
     };
   case RUN_TIME:
-    if (action.value) {
-      return {
-        ...state,
-        runTime: action.value,
-        time: 30,
-      };
-    }
-    break;
+    return {
+      ...state,
+      timer: 30,
+    };
+  case RESET_BUTTON:
+    return {
+      ...state,
+      isDlisable: false,
+    };
   default:
     return state;
   }

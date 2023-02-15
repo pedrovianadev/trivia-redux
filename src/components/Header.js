@@ -6,12 +6,13 @@ import { connect } from 'react-redux';
 class Header extends React.Component {
   render() {
     const { email, name } = this.props;
+    const avatar = md5(email).toString();
     return (
       <section>
         <img
           data-testid="header-profile-picture"
           alt="imagem de perfil"
-          src={ `https://www.gravatar.com/avatar/${md5(email)}` }
+          src={ `https://www.gravatar.com/avatar/${avatar}` }
         />
         <p data-testid="header-player-name">{ name }</p>
         <p data-testid="header-score">0</p>

@@ -5,6 +5,7 @@ import { Redirect } from 'react-router-dom';
 import Header from '../components/Header';
 import Question from '../components/Question';
 import Answers from '../components/Answers';
+import Timer from '../components/Timer';
 import { thunkQuestions } from '../redux/action';
 
 class Game extends React.Component {
@@ -12,12 +13,11 @@ class Game extends React.Component {
     super(props);
     this.state = {
       questionIndex: 0,
+      timer: 5,
       answered: false,
-    /*   question: null,
-      answers: null, */
+      isDisabled: false,
     };
     this.nextQuestion = this.nextQuestion.bind(this);
-    /*     this.getAnswers = this.getAnswers.bind(this); */
     this.handAnswers = this.handAnswers.bind(this);
     this.testResponse = this.testResponse.bind(this);
   }
@@ -26,38 +26,25 @@ class Game extends React.Component {
     const { dispatch } = this.props;
     const token = localStorage.getItem('token');
     await dispatch(thunkQuestions(token));
-    const { questions } = this.props;
-    console.log(questions);
-    // const { questionIndex } = this.state;
-
-  /*   this.setState({
-      question: questions[questionIndex],
-    }, () => this.getAnswers() ); */
+    this.handleTimer();
   }
 
-  /*  getAnswers() {
-    const { question } = this.state;
-    return question && this.setState({
-      answers: [...question.incorrect_answers, question.correct_answer].sort(),
-    });
-  } */
-
-  testResponse() {
-    this.setState({
-      answered: true,
-    });
-  }
-
-  nextQuestion() {
-    const { questionIndex } = this.state;
-    const { questions } = this.props;
-    if (questionIndex <= questions.length - 2) {
-      this.setState((prevState) => ({
-        questionIndex: prevState.questionIndex + 1,
-        answered: false,
-      /*   question: questions[prevState.questionIndex + 1], */
-      })/* , () => this.getAnswers() */);
-    }
+  handleTimer() {
+    const magicNumber = 1000;
+    const interval = setInterval(() => {
+      const { timer, answered } = this.state;
+      if (timer === 0 || answered) {
+        this.setState({
+          isDisabled: true,
+        });
+        return clearInterval(interval);
+      }
+      if (timer >= 0 && !answered) {
+        this.setState({
+          timer: timer - 1,
+        });
+      }
+    }, magicNumber);
   }
 
   handAnswers() {
@@ -73,15 +60,34 @@ class Game extends React.Component {
       dataTest: `wrong-answer-${index}`,
       style: 'wrong-answer',
     }));
-    const magicnumber = 0.5;
-    const mergeAlt = [correct, ...incorrect].sort(() => Math.random() - magicnumber);
+    const mergeAlt = [correct, ...incorrect];
     return mergeAlt;
   }
 
-  render() {
-    const { questionIndex, answered } = this.state;
-    const { questions, redirect } = this.props;
+  nextQuestion() {
+    const { questionIndex } = this.state;
+    const { questions } = this.props;
+    if (questionIndex <= questions.length - 2) {
+      this.setState((prevState) => ({
+        questionIndex: prevState.questionIndex + 1,
+        answered: false,
+        isDisabled: false,
+        timer: 5,
+      }));
+    }
+    this.handleTimer();
+  }
 
+  testResponse() {
+    this.setState({
+      answered: true,
+      isDisabled: true,
+    });
+  }
+
+  render() {
+    const { questionIndex, answered, isDisabled, timer } = this.state;
+    const { questions, redirect } = this.props;
     return (redirect ? <Redirect to="/" />
       : (
         <div>
@@ -92,14 +98,16 @@ class Game extends React.Component {
               <div>
                 <Question question={ questions[questionIndex] } />
                 <Answers
+                  timer={ timer }
                   answered={ answered }
-                  answers={ this.handAnswers() }
+                  answers={ this.handAnswers }
+                  isDisabled={ isDisabled }
                   testResponse={ this.testResponse }
                 />
               </div>)
           }
           {
-            answered && (
+            (answered || timer === 0) && (
               <button
                 data-testid="btn-next"
                 onClick={ () => this.nextQuestion() }
@@ -108,22 +116,21 @@ class Game extends React.Component {
               </button>
             )
           }
+          <Timer
+            handleTimer={ timer }
+          />
         </div>)
     );
   }
 }
-
 const mapStateToProps = (state) => ({
   token: state.user.token,
-  time: state.time.time,
   questions: state.user.questions,
   redirect: state.user.redirect,
 });
-
 Game.propTypes = {
   dispatch: PropTypes.func.isRequired,
   questions: PropTypes.objectOf.isRequired,
   redirect: PropTypes.bool.isRequired,
 };
-
 export default connect(mapStateToProps)(Game);
