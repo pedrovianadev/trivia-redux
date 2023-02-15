@@ -3,14 +3,16 @@ export const loginOk = (user) => ({ type: LOGIN, user });
 
 export const SEARCH_SUCCESS = 'SEARCH_SUCCESS';
 export const searchSuccess = (data) => (
-  { type: 'SEARCH_SUCCESS',
+  {
+    type: 'SEARCH_SUCCESS',
     payload: data,
   }
 );
 
 export const QUESTIONS = 'QUESTIONS';
 export const questions = (data) => (
-  { type: 'QUESTIONS',
+  {
+    type: 'QUESTIONS',
     payload: data,
   }
 );
@@ -30,15 +32,10 @@ export const tokenValid = () => ({
   type: TOKEN_VALID,
 });
 
-export const TIME = 'TIME';
-export const time = () => ({
-  type: TIME,
-});
-
-export const RUN_TIME = 'RUN_TIME';
-export const runTime = (value) => ({
-  type: RUN_TIME,
-  value,
+export const SCORE = 'SCORE';
+export const score = (points) => ({
+  type: SCORE,
+  payload: points,
 });
 
 export const RESET_BUTTON = 'TOKEN_VALID';
@@ -65,7 +62,8 @@ export function thunkQuestions(newToken) {
     try {
       const response = await fetch(`https://opentdb.com/api.php?amount=5&token=${newToken}`);
       if (newToken.length < numberMax) {
-        return dispatch(tokenInvalid());
+        dispatch(tokenInvalid());
+        return;
       }
       const data = await response.json();
       const token = localStorage.getItem('token');
@@ -73,7 +71,7 @@ export function thunkQuestions(newToken) {
         throw Error();
       }
       dispatch(questions(data.results));
-      console.log(data.results);
+      return data.results;
     } catch (error) {
       dispatch(tokenInvalid());
     }

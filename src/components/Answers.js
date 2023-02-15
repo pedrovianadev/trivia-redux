@@ -3,23 +3,18 @@ import PropTypes from 'prop-types';
 import '../style/answers.css';
 
 class Answers extends React.Component {
-  componentDidMount() {
-    console.log('aaa');
-  }
-
   render() {
     const { answers, answered, testResponse, isDisabled, timer } = this.props;
-    const result = answers().sort((a, b) => (a < b ? -1 : 1));
     return (
       <div data-testid="answer-options">
         {
-          result && result
+          answers && answers
             .map((answer) => (
               <button
                 data-testid={ answer.dataTest }
                 key={ answer.answers }
                 className={ (answered || timer === 0) ? answer.style : '' }
-                onClick={ () => testResponse() }
+                onClick={ () => testResponse(answer.dataTest) }
                 disabled={ isDisabled }
               >
                 {answer.answers}
