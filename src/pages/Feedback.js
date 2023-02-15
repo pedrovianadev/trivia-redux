@@ -1,48 +1,98 @@
 import React from 'react';
-import md5 from 'crypto-js';
-import { useHistory } from 'react-router-dom';
+import { connect } from 'react-redux';
+import PropTypes from 'prop-types';
+import md5 from 'crypto-js/md5';
 
-function Feedback() {
-  const history = useHistory();
-  const avatar = md5(email).toString();
+class Feedback extends React.Component {
+  constructor() {
+    super();
+    this.state = {
+      message: '',
+    };
+    this.scoreFeedback = this.scoreFeedback.bind(this);
+  }
 
-  return (
-    <div data-testid="feedback-text">
-      <img
-        alt="imagem de perfil"
-        src={ `https://www.gravatar.com/avatar/${avatar}` }
-        data-testid="header-profile-picture"
-      />
-      <p data-testid="header-player-name">
-        {user.name}
-      </p>
-      <p data-testid="header-score">
-        {user.score}
-      </p>
-      <h1 data-testid="feedback-total-score">
-        {user.score}
-      </h1>
+  componentDidMount() {
+    this.scoreFeedback();
+  }
 
-      {/* Abaixo eu preciso que seja feito a contabilidade de quantas o usuário acertou para que funcione, por isso está comentada */}
-      {/* <h2 data-testid="feedback-total-question">
-        {user.corrects}
-      </h2> */}
-      <button
-        type="button"
-        data-testid="btn-play-again"
-        onClick={ () => history.push('/') }
-      >
-        Play Again
-      </button>
-      <button
-        type="button"
-        data-testid="btn-ranking"
-        onClick={ () => history.push('/ranking') }
-      >
-        Ranking
-      </button>
-    </div>
-  );
+  scoreFeedback = () => {
+    const { player: {
+      assertions,
+    } } = this.props;
+
+    const scoreCouldBeBetter = 3;
+    if (assertions < scoreCouldBeBetter) {
+      this.setState({ message: 'Could be better...' });
+    } else {
+      this.setState({ message: 'Well Done!' });
+    }
+  };
+
+  render() {
+    const { player: {
+      assertions,
+      score,
+      gravatarEmail,
+    },
+    history, name } = this.props;
+
+    const { message } = this.state;
+
+    const avatar = md5(gravatarEmail).toString();
+
+    return (
+      <div>
+        <p data-testid="header-score">{ score }</p>
+        <img
+          data-testid="header-profile-picture"
+          alt="imagem de perfil"
+          src={ `https://www.gravatar.com/avatar/${avatar}` }
+        />
+        <h2 data-testid="header-player-name">{ name }</h2>
+        <h2
+          data-testid="feedback-text"
+        >
+          { message }
+        </h2>
+        <h2 data-testid="feedback-total-question">
+          { assertions }
+        </h2>
+        <h2 data-testid="feedback-total-score">
+          { score }
+        </h2>
+        <button
+          data-testid="btn-play-again"
+          onClick={ () => history.push('/') }
+        >
+          Play Again
+        </button>
+        <button
+          data-testid="btn-ranking"
+          onClick={ () => history.push('/ranking') }
+        >
+          Ranking
+        </button>
+      </div>
+    );
+  }
 }
 
-export default Feedback;
+Feedback.propTypes = {
+  player: PropTypes.shape({
+    assertions: PropTypes.number,
+    score: PropTypes.number,
+    gravatarEmail: PropTypes.string,
+  }).isRequired,
+  history: PropTypes.shape({
+    push: PropTypes.func,
+  }).isRequired,
+  name: PropTypes.string.isRequired,
+};
+
+const mapStateToProps = (globalState) => ({
+  player: globalState.player,
+  name: globalState.user.name,
+});
+
+export default connect(mapStateToProps)(Feedback);

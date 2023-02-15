@@ -38,6 +38,12 @@ export const score = (points) => ({
   payload: points,
 });
 
+export const ASSERTIONS = 'ASSERTIONS';
+export const assertions = (payload) => ({
+  type: ASSERTIONS,
+  payload,
+});
+
 export const RESET_BUTTON = 'TOKEN_VALID';
 export const resetButton = () => ({
   type: RESET_BUTTON,
