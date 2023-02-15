@@ -1,23 +1,34 @@
 import React from 'react';
-import { useHistory } from 'react-router-dom';
+import { connect } from 'react-redux';
+import PropTypes from 'prop-types';
 
-function Ranking() {
-  const history = useHistory();
+class Ranking extends React.Component {
+  render() {
+    const { history } = this.props;
 
-  return (
-    <div>
-      <h1 data-testid="ranking-title">
-        Ranking
-      </h1>
-      <button
-        type="button"
-        data-testid="btn-ho-home"
-        onClick={ () => history.push('/') }
-      >
-        Go to home page
-      </button>
-    </div>
-  );
+    return (
+      <div>
+        <h1>Ranking</h1>
+        <button
+          data-testid="btn-go-home"
+          onClick={ () => history.push('/') }
+        >
+          Go Home
+        </button>
+      </div>
+    );
+  }
 }
 
-export default Ranking;
+Ranking.propTypes = {
+  history: PropTypes.shape({
+    push: PropTypes.func,
+  }).isRequired,
+};
+
+const mapStateToProps = (globalState) => ({
+  player: globalState.player,
+  name: globalState.user.name,
+});
+
+export default connect(mapStateToProps)(Ranking);
