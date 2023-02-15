@@ -88,7 +88,7 @@ class Game extends React.Component {
       const medium = 2;
       sumPoints = mandatoryNum + (timer * medium);
     }
-    if (questions[questionIndex].difficulty === 'medium') {
+    if (questions[questionIndex].difficulty === 'easy') {
       const easy = 1;
       sumPoints = mandatoryNum + (timer * easy);
     }
