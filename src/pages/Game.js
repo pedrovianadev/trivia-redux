@@ -6,7 +6,7 @@ import Header from '../components/Header';
 import Question from '../components/Question';
 import Answers from '../components/Answers';
 import Timer from '../components/Timer';
-import { thunkQuestions } from '../redux/action';
+import { thunkQuestions, score } from '../redux/action';
 
 class Game extends React.Component {
   constructor(props) {
@@ -16,64 +16,86 @@ class Game extends React.Component {
       timer: 30,
       answered: false,
       isDisabled: false,
+      answers: [],
     };
     this.nextQuestion = this.nextQuestion.bind(this);
     this.handAnswers = this.handAnswers.bind(this);
     this.testResponse = this.testResponse.bind(this);
+    this.sumScore = this.sumScore.bind(this);
   }
 
   async componentDidMount() {
-    const { dispatch } = this.props;
+    const { thunk } = this.props;
     const token = localStorage.getItem('token');
-    await dispatch(thunkQuestions(token));
+    if (!token) return;
+    const questions = await thunk(token);
+    if (!questions || questions.length === 0) {
+      return;
+    }
     this.handleTimer();
+    this.handAnswers(questions);
   }
-
-  /*  getAnswers() {
-    const { question } = this.state;
-    return question && this.setState({
-      answers: [...question.incorrect_answers, question.correct_answer].sort(),
-    });
-  } */
 
   handleTimer() {
     const magicNumber = 1000;
     const interval = setInterval(() => {
-      const { timer } = this.state;
-      console.log(timer);
-      if (timer === 0) {
+      const { timer, answered } = this.state;
+      if (timer === 0 || answered) {
         this.setState({
           isDisabled: true,
         });
-        clearInterval(interval);
-        return;
+        return clearInterval(interval);
       }
-      this.setState({
-        timer: timer - 1,
-      });
+      if (timer >= 0 && !answered) {
+        this.setState({
+          timer: timer - 1,
+        });
+      }
     }, magicNumber);
   }
 
-  handAnswers() {
-    const { questions } = this.props;
+  handAnswers(questions) {
     const { questionIndex } = this.state;
+    const correctAnswer = 'correct-answer';
+    console.log('aaa');
     const correct = {
       answers: questions[questionIndex].correct_answer,
-      dataTest: 'correct-answer',
-      style: 'correct-answer',
+      dataTest: correctAnswer,
+      style: correctAnswer,
     };
     const incorrect = questions[questionIndex].incorrect_answers.map((alt, index) => ({
       answers: alt,
       dataTest: `wrong-answer-${index}`,
       style: 'wrong-answer',
     }));
-    const magicnumber = 0.5;
-    const mergeAlt = [correct, ...incorrect].sort(() => Math.random() - magicnumber);
-    return mergeAlt;
+    const mergeAlt = [correct, ...incorrect];
+    const sortNumber = 0.5;
+    this.setState({
+      answers: mergeAlt.sort(() => (Math.random() - sortNumber)),
+    });
+  }
+
+  sumScore() {
+    const { timer, questionIndex } = this.state;
+    const { sumScore, questions } = this.props;
+    const mandatoryNum = 10;
+    let sumPoints = 0;
+    if (questions[questionIndex].difficulty === 'hard') {
+      const hard = 3;
+      sumPoints = mandatoryNum + (timer * hard);
+    }
+    if (questions[questionIndex].difficulty === 'medium') {
+      const medium = 2;
+      sumPoints = mandatoryNum + (timer * medium);
+    }
+    if (questions[questionIndex].difficulty === 'medium') {
+      const easy = 1;
+      sumPoints = mandatoryNum + (timer * easy);
+    }
+    sumScore(sumPoints);
   }
 
   nextQuestion() {
-    console.log('oi');
     const { questionIndex } = this.state;
     const { questions } = this.props;
     if (questionIndex <= questions.length - 2) {
@@ -82,21 +104,30 @@ class Game extends React.Component {
         answered: false,
         isDisabled: false,
         timer: 30,
-      /*   question: questions[prevState.questionIndex + 1], */
-      })/* , () => this.getAnswers() */);
+      }), () => this.handAnswers(questions));
+    }
+    this.handleTimer();
+    if (questionIndex === questions.length - 1) {
+      const { history } = this.props;
+      history.push('/feedback');
     }
   }
 
-  testResponse() {
+  testResponse(dataTest) {
+    console.log(dataTest);
     this.setState({
       answered: true,
       isDisabled: true,
     });
+    if (dataTest === 'correct-answer') {
+      this.sumScore();
+    }
   }
 
   render() {
-    const { questionIndex, answered, isDisabled, timer } = this.state;
+    const { questionIndex, answered, isDisabled, timer, answers } = this.state;
     const { questions, redirect } = this.props;
+
     return (redirect ? <Redirect to="/" />
       : (
         <div>
@@ -107,15 +138,16 @@ class Game extends React.Component {
               <div>
                 <Question question={ questions[questionIndex] } />
                 <Answers
+                  timer={ timer }
                   answered={ answered }
-                  answers={ this.handAnswers }
+                  answers={ answers }
                   isDisabled={ isDisabled }
                   testResponse={ this.testResponse }
                 />
               </div>)
           }
           {
-            answered && (
+            (answered || timer === 0) && (
               <button
                 data-testid="btn-next"
                 onClick={ () => this.nextQuestion() }
@@ -131,14 +163,25 @@ class Game extends React.Component {
     );
   }
 }
+
+const mapDispatchToProps = (dispatch) => ({
+  sumScore: (sumPoints) => dispatch(score(sumPoints)),
+  thunk: (token) => dispatch(thunkQuestions(token)),
+});
+
 const mapStateToProps = (state) => ({
   token: state.user.token,
   questions: state.user.questions,
   redirect: state.user.redirect,
 });
+
 Game.propTypes = {
-  dispatch: PropTypes.func.isRequired,
+  sumScore: PropTypes.func.isRequired,
+  thunk: PropTypes.func.isRequired,
   questions: PropTypes.objectOf.isRequired,
   redirect: PropTypes.bool.isRequired,
+  history: PropTypes.shape({
+    push: PropTypes.func.isRequired,
+  }).isRequired,
 };
-export default connect(mapStateToProps)(Game);
+export default connect(mapStateToProps, mapDispatchToProps)(Game);

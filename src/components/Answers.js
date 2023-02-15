@@ -1,22 +1,20 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
 import '../style/answers.css';
 
 class Answers extends React.Component {
   render() {
-    const { answers, answered, testResponse, isDisabled } = this.props;
-    const result = answers();
+    const { answers, answered, testResponse, isDisabled, timer } = this.props;
     return (
       <div data-testid="answer-options">
         {
-          result && result
+          answers && answers
             .map((answer) => (
               <button
                 data-testid={ answer.dataTest }
                 key={ answer.answers }
-                className={ answered ? answer.style : '' }
-                onClick={ () => testResponse() }
+                className={ (answered || timer === 0) ? answer.style : '' }
+                onClick={ () => testResponse(answer.dataTest) }
                 disabled={ isDisabled }
               >
                 {answer.answers}
@@ -32,10 +30,7 @@ Answers.propTypes = {
   answered: PropTypes.bool.isRequired,
   testResponse: PropTypes.func.isRequired,
   isDisabled: PropTypes.bool.isRequired,
+  timer: PropTypes.number.isRequired,
 };
 
-const mapStateToProps = (state) => ({
-  timer: state.time.timer,
-});
-
-export default connect(mapStateToProps)(Answers);
+export default Answers;
