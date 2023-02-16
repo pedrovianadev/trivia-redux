@@ -8,7 +8,7 @@ class Ranking extends React.Component {
 
     return (
       <div>
-        <h1>Ranking</h1>
+        <h1 data-testid="ranking-title">Ranking</h1>
         <button
           data-testid="btn-go-home"
           onClick={ () => history.push('/') }
