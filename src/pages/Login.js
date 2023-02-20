@@ -31,6 +31,10 @@ class Login extends React.Component {
       });
     submitLoginAction(this.state);
     await dispatchToken();
+    const ranking = localStorage.getItem('ranking');
+    if (!ranking) {
+      localStorage.setItem('ranking', JSON.stringify([]));
+    }
     history.push('/game');
   };
 
