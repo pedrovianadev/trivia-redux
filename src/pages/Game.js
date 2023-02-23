@@ -98,6 +98,7 @@ class Game extends React.Component {
   nextQuestion() {
     const { questionIndex } = this.state;
     const { questions } = this.props;
+    console.log(questions);
     if (questionIndex <= questions.length - 2) {
       this.setState((prevState) => ({
         questionIndex: prevState.questionIndex + 1,

@@ -77,9 +77,22 @@ const INITAL_SIMULATION = {
           ]
         }
       ],
-      current_question: 0
+      current_question: 0,
     },
 }
+
+const player = [
+  {
+      score: 144,
+      gravatar:"https://www.gravatar.com/avatar/d41d8cd98f00b204e9800998ecf8427e",
+      name: 'teste1',
+  },
+  {
+      score: 70,
+      gravatar:"https://www.gravatar.com/avatar/d41d8cd98f00b204e9800998ecf8427e",
+      name: 'teste2',
+  },
+];
 
 const INITAL_STORE = {
   player: {
@@ -119,6 +132,7 @@ describe('Verifica a tela de feedback', () => {
 
     })
     it('se ao clicar no botão "Play" redireciona para a tela de Login', () => {
+      localStorage.setItem('ranking', JSON.stringify(player))
         const { history } = renderWithRouterAndRedux(<App />, INITAL_SIMULATION , '/feedback')
 
         const btnEl = screen.getByTestId('btn-play-again');
@@ -133,6 +147,7 @@ describe('Verifica a tela de feedback', () => {
         const btnEl = screen.getByTestId('btn-ranking');
 
         userEvent.click(btnEl);
-        expect(history.location.pathname).toBe('/ranking');
+        const { pathname } = history.location;
+        expect(pathname).toBe('/Ranking');
     });
 })
